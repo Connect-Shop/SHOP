@@ -2,6 +2,7 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Game & IT Store</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -9,25 +10,118 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- SweetAlert2 -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <!-- Prompt Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+  <!-- Google Fonts (Prompt) -->
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    body { font-family: 'Prompt', sans-serif; background-color: #f8fafc; }
+    :root {
+      --bg-body-dark: #181a20;
+      --bg-card-dark: #212529;
+      --bg-input-dark: #2b3035;
+      --border-color-dark: #383d42;
+      --primary-blue: #4facfe;
+      --text-gray: #adb5bd;
+      --text-white: #ffffff;
+    }
+
+    body { font-family: 'Prompt', sans-serif; background-color: #f8fafc; color: #333; }
+    
+    /* Shop UI Styles */
     .glass-nav { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-    .loader { border-top-color: #3B82F6; -webkit-animation: spinner 1s linear infinite; animation: spinner 1s linear infinite; }
-    @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     .card-zoom:hover img { transform: scale(1.1); }
     .card-zoom img { transition: transform 0.3s ease; }
+    .loader { border-top-color: #3B82F6; animation: spinner 1s linear infinite; }
+    @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    /* Modal & Input Styles (Fix Zoom) */
+    .app-container {
+        width: 100%; max-width: 480px; background-color: var(--bg-card-dark);
+        min-height: 100vh; display: flex; flex-direction: column; overflow: hidden; position: relative;
+    }
+    @media (min-width: 640px) {
+        .app-container { min-height: auto; height: 650px; border-radius: 16px; }
+    }
+
+    input, select, textarea { font-size: 16px !important; }
+
+    .seagm-input-group { position: relative; margin-bottom: 16px; }
+    .seagm-input {
+        width: 100%; background-color: var(--bg-input-dark); border: 1px solid var(--border-color-dark);
+        border-radius: 6px; padding: 12px 12px 12px 45px; color: white; font-size: 16px; transition: all 0.2s; outline: none;
+    }
+    .seagm-input.has-btn { padding-right: 100px; }
+    .search-input {
+        width: 100%; background-color: #181a20; border: 1px solid var(--border-color-dark);
+        border-radius: 6px; padding: 10px 10px 10px 40px; color: white; font-size: 16px; outline: none;
+    }
+    .seagm-input:focus, .search-input:focus, .seagm-select:focus { border-color: var(--primary-blue); }
+    
+    /* New Select Style */
+    .seagm-select {
+        width: 100%; background-color: var(--bg-input-dark); border: 1px solid var(--border-color-dark);
+        border-radius: 6px; padding: 12px 12px 12px 12px; color: white; font-size: 16px; outline: none;
+        appearance: none; cursor: pointer;
+    }
+    .select-wrapper { position: relative; margin-bottom: 16px; }
+    .select-wrapper::after {
+        content: '\f078'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+        position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+        color: #6c757d; pointer-events: none; font-size: 12px;
+    }
+
+    .input-icon {
+        position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+        color: #6c757d; font-size: 16px; width: 20px; text-align: center;
+    }
+
+    .btn-primary-dark {
+        background-color: var(--primary-blue); color: white; border-radius: 6px;
+        padding: 12px; width: 100%; font-weight: 600; border: none; font-size: 16px;
+        transition: 0.2s; cursor: pointer; margin-top: 10px;
+    }
+    .btn-otp {
+        position: absolute; right: 6px; top: 6px; bottom: 6px;
+        background-color: rgba(79, 172, 254, 0.1); color: var(--primary-blue);
+        border: 1px solid rgba(79, 172, 254, 0.3); border-radius: 4px; padding: 0 12px;
+        font-size: 14px; font-weight: 500; cursor: pointer; transition: 0.2s;
+    }
+    
+    .country-selector {
+        background-color: var(--bg-input-dark); border: 1px solid var(--border-color-dark);
+        border-radius: 6px; padding: 10px 15px; display: flex; align-items: center;
+        justify-content: space-between; margin-bottom: 10px; cursor: pointer; transition: 0.2s;
+    }
+    .country-modal {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background-color: var(--bg-card-dark); z-index: 100;
+        transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex; flex-direction: column;
+    }
+    .country-modal.open { transform: translateX(0); }
+    .country-list-item {
+        display: flex; align-items: center; padding: 12px 16px; border-bottom: 1px solid #2b3035;
+        cursor: pointer; transition: background 0.2s;
+    }
+    .country-list-item:hover { background-color: #2b3035; }
+
+    .tab-container { display: flex; border-bottom: 1px solid var(--border-color-dark); margin-bottom: 20px; }
+    .tab-item {
+        flex: 1; text-align: center; padding: 12px; font-size: 15px;
+        color: var(--text-gray); cursor: pointer; border-bottom: 2px solid transparent; transition: 0.3s;
+    }
+    .tab-item.active { color: white; border-bottom: 2px solid var(--primary-blue); font-weight: 500; }
+    
+    .fade-in { animation: fadeIn 0.3s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
-<body>
+<body class="bg-gray-50">
 
   <!-- Loading Screen -->
   <div id="loadingOverlay" class="fixed inset-0 z-[60] flex flex-col items-center justify-center bg-white transition-opacity duration-500">
-    <div class="mb-6 text-5xl text-blue-600"><i class="fa-solid fa-gamepad fa-bounce"></i></div>
+    <div class="mb-4 text-4xl text-blue-600"><i class="fa-solid fa-gamepad fa-bounce"></i></div>
     <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-10 w-10 mb-4"></div>
-    <h2 class="text-gray-500 text-sm animate-pulse">กำลังเชื่อมต่อฐานข้อมูล...</h2>
+    <h2 class="text-gray-500 text-sm animate-pulse">กำลังโหลดร้านค้า...</h2>
   </div>
 
   <!-- Navbar -->
@@ -35,23 +129,22 @@
     <div class="max-w-7xl mx-auto px-4">
       <div class="flex justify-between items-center h-16">
         <div class="flex items-center space-x-2 cursor-pointer" onclick="window.scrollTo(0,0)">
-          <div class="bg-blue-600 text-white p-2 rounded-lg"><i class="fa-solid fa-bolt"></i></div>
+          <div class="bg-blue-600 text-white p-2 rounded-lg shadow-md"><i class="fa-solid fa-bolt"></i></div>
           <span class="font-bold text-xl text-gray-800 tracking-tight">G-STORE</span>
         </div>
         
-        <!-- Menu -->
         <div class="flex items-center space-x-4">
           <div id="guestMenu">
-            <button onclick="openModal()" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium py-2 px-5 rounded-full shadow-lg transform transition hover:scale-105 text-sm">
-              <i class="fa-solid fa-user-circle mr-2"></i>เข้าสู่ระบบ
+            <button onclick="openAuthModal()" class="bg-black text-white px-5 py-2 rounded-full font-medium text-sm hover:bg-gray-800 transition shadow-lg">
+              <i class="fa-regular fa-user mr-2"></i>เข้าสู่ระบบ
             </button>
           </div>
-          <div id="userMenu" class="hidden flex items-center bg-gray-100 rounded-full px-4 py-1.5 space-x-3">
+          <div id="userMenu" class="hidden flex items-center bg-gray-100 rounded-full px-4 py-1.5 space-x-3 border border-gray-200">
             <div class="flex flex-col items-end leading-tight">
-              <span class="text-xs text-gray-500">ยินดีต้อนรับ</span>
+              <span class="text-xs text-gray-500">สวัสดี</span>
               <span class="text-sm font-bold text-blue-600 truncate max-w-[100px]" id="userNameDisplay">User</span>
             </div>
-            <button onclick="logout()" class="w-8 h-8 rounded-full bg-white text-red-500 hover:bg-red-50 shadow flex items-center justify-center transition">
+            <button onclick="logout()" class="w-8 h-8 rounded-full bg-white text-red-500 hover:bg-red-50 shadow flex items-center justify-center">
               <i class="fa-solid fa-power-off"></i>
             </button>
           </div>
@@ -62,145 +155,182 @@
 
   <!-- Main Content -->
   <div class="pt-24 pb-12 px-4 max-w-7xl mx-auto min-h-screen">
-    
     <!-- Banner -->
     <div class="relative rounded-2xl overflow-hidden shadow-2xl mb-10 group h-48 md:h-80">
       <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1200" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
       <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6 md:p-10">
-        <span class="bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded w-max mb-2">PROMOTION</span>
-        <h1 class="text-white text-2xl md:text-5xl font-bold mb-2">เติมเกมส์ & ไอที ราคาถูก</h1>
-        <p class="text-gray-200 text-sm md:text-lg">บริการรวดเร็วตลอด 24 ชม. รับประกันความปลอดภัย</p>
+        <span class="bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded w-max mb-2">NEW ARRIVAL</span>
+        <h1 class="text-white text-2xl md:text-5xl font-bold mb-2">เติมเกมส์ & ไอที ครบวงจร</h1>
+        <p class="text-gray-200 text-sm md:text-lg">ปลอดภัย 100% รับประกันสินค้าทุกชิ้น</p>
       </div>
     </div>
-
-    <!-- Product Section -->
+    <!-- Products -->
     <div class="mb-12">
-      <div class="flex items-center justify-between mb-6">
-        <h2 class="text-2xl font-bold text-gray-800 border-l-4 border-blue-600 pl-3">สินค้าขายดี</h2>
-      </div>
-      <div id="productGrid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-5">
-        <!-- JS Render -->
-      </div>
+      <h2 class="text-2xl font-bold text-gray-800 border-l-4 border-blue-600 pl-3 mb-6">สินค้าแนะนำ</h2>
+      <div id="productGrid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
     </div>
-
-    <!-- Game Section -->
+    <!-- Games -->
     <div class="mb-12">
-      <div class="flex items-center justify-between mb-6">
-        <h2 class="text-2xl font-bold text-gray-800 border-l-4 border-purple-600 pl-3">เติมเกมส์มือถือ</h2>
-      </div>
-      <div id="gameGrid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-5">
-        <!-- JS Render -->
-      </div>
+      <h2 class="text-2xl font-bold text-gray-800 border-l-4 border-purple-600 pl-3 mb-6">เติมเกมส์ออนไลน์</h2>
+      <div id="gameGrid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
     </div>
-
   </div>
 
-  <!-- Modal -->
-  <div id="authModal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-      <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeModal()"></div>
-      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-      
-      <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md w-full relative">
+  <!-- AUTH MODAL -->
+  <div id="authModal" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity" onclick="closeAuthModal()"></div>
+    
+    <div class="flex items-center justify-center min-h-screen p-0 sm:p-4 pointer-events-none">
+      <div class="app-container pointer-events-auto shadow-2xl transform transition-all">
         
-        <!-- Close Button -->
-        <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10">
-          <i class="fa-solid fa-xmark text-xl"></i>
-        </button>
+        <!-- Header -->
+        <header class="flex justify-between items-center p-4 border-b border-[#383d42] bg-[#212529]/95 backdrop-blur sticky top-0 z-50">
+           <div class="flex items-center">
+             <button onclick="closeAuthModal()" class="mr-3 text-gray-400 hover:text-white sm:hidden"><i class="fa-solid fa-arrow-left"></i></button>
+             <h1 class="text-lg font-bold italic tracking-wide text-white" id="page-title">เข้าสู่ระบบ</h1>
+           </div>
+           <div class="flex items-center gap-2">
+             <button onclick="toggleMainView()" class="text-xs text-white border border-[#495057] px-3 py-1.5 rounded bg-[#2b3035] hover:border-[#adb5bd] transition">
+                 <span id="switch-btn-text">สมัครสมาชิก</span>
+             </button>
+             <button onclick="closeAuthModal()" class="text-gray-400 hover:text-white ml-2 hidden sm:block"><i class="fa-solid fa-xmark text-xl"></i></button>
+           </div>
+        </header>
 
-        <!-- Tabs -->
-        <div class="flex border-b">
-          <button id="tabLogin" onclick="switchTab('login')" class="flex-1 py-4 text-center font-bold text-blue-600 border-b-2 border-blue-600 bg-blue-50">เข้าสู่ระบบ</button>
-          <button id="tabRegister" onclick="switchTab('register')" class="flex-1 py-4 text-center font-bold text-gray-500 hover:bg-gray-50 transition">สมัครสมาชิก</button>
+        <div class="p-5 flex-1 overflow-y-auto custom-scrollbar">
+
+            <!-- LOGIN VIEW -->
+            <div id="view-login" class="fade-in">
+                <!-- Tabs -->
+                <div class="tab-container">
+                    <div id="tab-login-main" class="tab-item active" onclick="switchLoginTab('main')">รหัสผ่าน</div>
+                    <div id="tab-login-otp" class="tab-item" onclick="switchLoginTab('otp')">อีเมล OTP</div>
+                </div>
+
+                <!-- LOGIN TAB: MAIN (Email/User/Phone + Password) -->
+                <div id="form-login-main" class="fade-in">
+                    
+                    <!-- INPUT SELECT: Method Choice -->
+                    <div class="select-wrapper">
+                        <select id="login-method-select" class="seagm-select" onchange="toggleLoginMethod()">
+                            <option value="email">อีเมล / ชื่อผู้ใช้</option>
+                            <option value="phone">เบอร์โทรศัพท์มือถือ</option>
+                        </select>
+                    </div>
+
+                    <!-- Input: Email/User -->
+                    <div id="input-group-email" class="seagm-input-group">
+                        <i class="fa-solid fa-user input-icon"></i>
+                        <input type="text" id="login-username" class="seagm-input" placeholder="อีเมล หรือ ชื่อผู้ใช้">
+                    </div>
+
+                    <!-- Input: Phone (Hidden by default) -->
+                    <div id="input-group-phone" class="hidden">
+                        <div class="country-selector group" onclick="openCountryModal('login')">
+                            <div class="flex items-center gap-3">
+                                <img id="login-selected-flag" src="https://flagcdn.com/w40/th.png" alt="TH" class="w-6 h-4 rounded-sm object-cover shadow-sm">
+                                <span id="login-selected-code" class="text-white font-medium text-sm">+66</span>
+                                <span id="login-selected-name" class="text-[#adb5bd] text-sm border-l border-[#383d42] pl-3 ml-1 group-hover:text-white transition">Thailand</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-[#6c757d] text-xs"></i>
+                        </div>
+                        <div class="seagm-input-group">
+                            <i class="fa-solid fa-mobile-screen input-icon"></i>
+                            <input type="tel" id="login-phone" class="seagm-input" placeholder="หมายเลขโทรศัพท์">
+                        </div>
+                    </div>
+
+                    <!-- Input: Password (Shared) -->
+                    <div class="seagm-input-group">
+                        <i class="fa-solid fa-lock input-icon"></i>
+                        <input type="password" id="login-pass" class="seagm-input" placeholder="รหัสผ่าน">
+                        <i class="fa-solid fa-eye absolute right-4 top-1/2 -translate-y-1/2 text-[#6c757d] cursor-pointer hover:text-white transition" onclick="togglePass('login-pass')"></i>
+                    </div>
+
+                    <button class="btn-primary-dark" onclick="submitLogin()">เข้าสู่ระบบ</button>
+                </div>
+
+                <!-- LOGIN TAB: OTP -->
+                <div id="form-login-otp" class="hidden fade-in">
+                    <div class="seagm-input-group">
+                        <i class="fa-solid fa-envelope input-icon"></i>
+                        <input type="email" id="login-otp-email" class="seagm-input" placeholder="กรอกอีเมลของคุณ">
+                    </div>
+                    <div class="seagm-input-group">
+                        <i class="fa-solid fa-shield-halved input-icon"></i>
+                        <input type="text" id="login-otp-code" class="seagm-input has-btn" placeholder="รหัส OTP 6 หลัก" maxlength="6">
+                        <button class="btn-otp" onclick="requestOtp('login-otp-email', this)">ส่งรหัสยืนยัน</button>
+                    </div>
+                    <button class="btn-primary-dark mt-6" onclick="submitLoginOtp()">เข้าสู่ระบบ</button>
+                </div>
+
+                <div class="mt-8 text-center">
+                    <div class="flex items-center mb-6">
+                        <div class="flex-1 h-px bg-[#383d42]"></div>
+                        <span class="px-3 text-xs text-[#6c757d]">เชื่อมต่อด้วย Line OA</span>
+                        <div class="flex-1 h-px bg-[#383d42]"></div>
+                    </div>
+                    <button class="w-12 h-12 rounded-full bg-[#00c300] text-white inline-flex items-center justify-center hover:opacity-90 shadow-lg">
+                        <i class="fa-brands fa-line text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- REGISTER VIEW -->
+            <div id="view-register" class="hidden fade-in">
+                <div class="mb-6 text-center">
+                    <p class="text-sm text-[#adb5bd]">สร้างบัญชีใหม่เพื่อเข้าถึงบริการทั้งหมด</p>
+                </div>
+                <div class="seagm-input-group">
+                    <i class="fa-solid fa-envelope input-icon"></i>
+                    <input type="email" id="reg-email" class="seagm-input" placeholder="อีเมล">
+                </div>
+                <div class="seagm-input-group">
+                    <i class="fa-brands fa-line input-icon"></i>
+                    <input type="text" id="reg-line" class="seagm-input" placeholder="Line ID">
+                </div>
+                <div class="mb-4">
+                    <div class="country-selector group" onclick="openCountryModal('register')">
+                        <div class="flex items-center gap-3">
+                            <img id="reg-selected-flag" src="https://flagcdn.com/w40/th.png" alt="TH" class="w-6 h-4 rounded-sm object-cover shadow-sm">
+                            <span id="reg-selected-code" class="text-white font-medium text-sm">+66</span>
+                            <span id="reg-selected-name" class="text-[#adb5bd] text-sm border-l border-[#383d42] pl-3 ml-1 group-hover:text-white transition">Thailand</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-[#6c757d] text-xs"></i>
+                    </div>
+                    <div class="seagm-input-group">
+                        <i class="fa-solid fa-mobile-screen input-icon"></i>
+                        <input type="tel" id="reg-phone" class="seagm-input" placeholder="หมายเลขโทรศัพท์">
+                    </div>
+                </div>
+                <div class="seagm-input-group">
+                    <i class="fa-solid fa-shield-halved input-icon"></i>
+                    <input type="text" id="reg-otp" class="seagm-input has-btn" placeholder="รหัส OTP" maxlength="6">
+                    <button class="btn-otp" onclick="requestOtp('reg-email', this)">ส่งรหัส</button>
+                </div>
+                <div class="seagm-input-group">
+                    <i class="fa-solid fa-lock input-icon"></i>
+                    <input type="password" id="reg-pass" class="seagm-input" placeholder="ตั้งรหัสผ่าน">
+                    <i class="fa-solid fa-eye absolute right-4 top-1/2 -translate-y-1/2 text-[#6c757d] cursor-pointer hover:text-white transition" onclick="togglePass('reg-pass')"></i>
+                </div>
+                <button class="btn-primary-dark mt-4" onclick="submitRegister()">สมัครสมาชิก</button>
+            </div>
         </div>
 
-        <!-- Login Form -->
-        <div id="loginForm" class="p-6 md:p-8">
-          <div class="flex space-x-2 mb-6 bg-gray-100 p-1 rounded-lg">
-            <button onclick="setLoginType('password')" id="typePass" class="flex-1 py-1.5 rounded-md bg-white text-blue-600 shadow-sm text-sm font-semibold transition">รหัสผ่าน</button>
-            <button onclick="setLoginType('otp')" id="typeOtp" class="flex-1 py-1.5 rounded-md text-gray-500 text-sm font-semibold transition hover:text-gray-700">OTP</button>
-          </div>
-
-          <form onsubmit="doLogin(event)">
-            <input type="hidden" id="loginMode" value="password">
-            
-            <div class="mb-4">
-              <label class="block text-gray-700 text-xs font-bold mb-1.5 ml-1">อีเมลผู้ใช้งาน</label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                  <i class="fa-solid fa-envelope"></i>
+        <!-- FULL COUNTRY LIST MODAL -->
+        <div id="country-modal" class="country-modal">
+            <div class="flex justify-between items-center p-4 border-b border-[#383d42] bg-[#212529]">
+                <button onclick="closeCountryModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-arrow-left"></i></button>
+                <span class="font-medium text-white">เลือกประเทศ</span>
+                <div class="w-6"></div>
+            </div>
+            <div class="p-3 bg-[#212529] border-b border-[#383d42]">
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm"></i>
+                    <input type="text" id="search-country" class="search-input" placeholder="ค้นหาประเทศ..." onkeyup="filterCountries()">
                 </div>
-                <input type="email" id="loginEmail" required class="w-full pl-10 pr-3 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm" placeholder="email@example.com">
-              </div>
             </div>
-
-            <!-- Password -->
-            <div id="fieldPass" class="mb-6">
-              <label class="block text-gray-700 text-xs font-bold mb-1.5 ml-1">รหัสผ่าน</label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                  <i class="fa-solid fa-lock"></i>
-                </div>
-                <input type="password" id="loginPassword" class="w-full pl-10 pr-3 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none transition text-sm">
-              </div>
-            </div>
-
-            <!-- OTP -->
-            <div id="fieldOtp" class="hidden mb-6">
-              <label class="block text-gray-700 text-xs font-bold mb-1.5 ml-1">รหัส OTP</label>
-              <div class="flex space-x-2">
-                <input type="text" id="loginOtp" class="w-full px-3 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none transition text-sm text-center tracking-widest" placeholder="XXXXXX">
-                <button type="button" onclick="getOtp('loginEmail')" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 rounded-lg shadow font-medium text-xs whitespace-nowrap transition">ขอรหัส</button>
-              </div>
-            </div>
-
-            <button type="submit" id="btnLogin" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-lg hover:shadow-xl transition duration-200 transform hover:-translate-y-0.5">เข้าสู่ระบบ</button>
-          </form>
-        </div>
-
-        <!-- Register Form -->
-        <div id="registerForm" class="hidden p-6 md:p-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
-          <form onsubmit="doRegister(event)">
-            <div class="grid grid-cols-2 gap-3 mb-3">
-              <div>
-                <label class="block text-xs font-bold text-gray-700 mb-1">ประเทศ</label>
-                <select id="regCountry" class="w-full border rounded-lg py-2 px-2 text-sm bg-gray-50 focus:bg-white transition">
-                  <option value="Thailand">Thailand 🇹🇭</option>
-                  <option value="Laos">Laos 🇱🇦</option>
-                  <option value="Vietnam">Vietnam 🇻🇳</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-gray-700 mb-1">เบอร์โทร</label>
-                <input type="tel" id="regPhone" required class="w-full border rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-purple-500 outline-none">
-              </div>
-            </div>
-
-            <div class="mb-3">
-              <label class="block text-xs font-bold text-gray-700 mb-1">Line ID</label>
-              <input type="text" id="regLine" class="w-full border rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-purple-500 outline-none">
-            </div>
-
-            <div class="mb-3">
-              <label class="block text-xs font-bold text-gray-700 mb-1">อีเมล (รับ OTP)</label>
-              <div class="flex space-x-2">
-                <input type="email" id="regEmail" required class="w-full border rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-purple-500 outline-none">
-                <button type="button" onclick="getOtp('regEmail')" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 rounded-lg text-xs font-bold whitespace-nowrap transition">ส่งรหัส</button>
-              </div>
-            </div>
-
-            <div class="mb-3">
-              <label class="block text-xs font-bold text-gray-700 mb-1">รหัสยืนยัน OTP</label>
-              <input type="text" id="regOtp" required class="w-full border rounded-lg py-2 px-3 text-sm text-center tracking-widest focus:border-purple-500 outline-none" placeholder="------">
-            </div>
-
-            <div class="mb-5">
-              <label class="block text-xs font-bold text-gray-700 mb-1">กำหนดรหัสผ่าน</label>
-              <input type="password" id="regPass" required class="w-full border rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-purple-500 outline-none">
-            </div>
-
-            <button type="submit" id="btnReg" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg shadow-lg hover:shadow-xl transition duration-200">สมัครสมาชิก</button>
-          </form>
+            <div id="country-list-container" class="flex-1 overflow-y-auto custom-scrollbar"></div>
         </div>
 
       </div>
@@ -208,215 +338,227 @@
   </div>
 
   <script>
-    // --- Global Vars ---
+    // --- Data & State ---
+    const allCountries = [
+        { code: "TH", name: "Thailand", dial_code: "+66" },
+        { code: "LA", name: "Laos", dial_code: "+856" },
+        { code: "VN", name: "Vietnam", dial_code: "+84" },
+        { code: "US", name: "United States", dial_code: "+1" },
+        { code: "GB", name: "United Kingdom", dial_code: "+44" },
+        { code: "JP", name: "Japan", dial_code: "+81" },
+        { code: "KR", name: "South Korea", dial_code: "+82" },
+        { code: "CN", name: "China", dial_code: "+86" },
+        { code: "MM", name: "Myanmar", dial_code: "+95" },
+        { code: "KH", name: "Cambodia", dial_code: "+855" }
+    ];
     let currentUser = null;
+    let isLoginView = true;
+    let currentCountryContext = 'register'; // 'register' or 'login'
 
     // --- Init ---
     window.onload = function() {
-      fetchData();
+        google.script.run.withSuccessHandler(renderShop).getShopData();
     };
 
-    function fetchData() {
-      google.script.run
-        .withSuccessHandler(renderShop)
-        .withFailureHandler(err => {
-           Swal.fire('Error', 'โหลดข้อมูลไม่สำเร็จ: ' + err.message, 'error');
-           document.getElementById('loadingOverlay').classList.add('hidden');
-        })
-        .getShopData();
-    }
-
     function renderShop(data) {
-      document.getElementById('loadingOverlay').classList.add('opacity-0');
-      setTimeout(() => document.getElementById('loadingOverlay').classList.add('hidden'), 500);
-
-      // Render Products
-      document.getElementById('productGrid').innerHTML = data.products.map(p => `
-        <div class="bg-white rounded-xl shadow-sm hover:shadow-xl transition duration-300 overflow-hidden flex flex-col h-full card-zoom border border-gray-100">
-          <div class="h-36 overflow-hidden relative bg-gray-100">
-            <img src="${p.image}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/150'">
-            ${p.discount > 0 ? `<div class="absolute top-2 right-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow">ลด ${p.discount}.-</div>` : ''}
-          </div>
-          <div class="p-3 flex-1 flex flex-col justify-between">
-            <div>
-              <h3 class="font-bold text-gray-800 text-sm truncate leading-tight">${p.name}</h3>
-              <p class="text-xs text-gray-500 mt-1 line-clamp-2 h-8">${p.detail}</p>
-            </div>
-            <div class="mt-3 pt-3 border-t border-gray-100">
-               <div class="flex justify-between items-end mb-2">
-                 <span class="text-blue-600 font-bold text-sm">฿${(p.price - p.discount).toLocaleString()}</span>
-                 <span class="text-[10px] text-gray-400 line-through">฿${p.price.toLocaleString()}</span>
-               </div>
-               <button onclick="buy('${p.name}')" class="w-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white font-bold py-1.5 rounded-lg text-xs transition-colors">สั่งซื้อทันที</button>
-            </div>
-          </div>
-        </div>
-      `).join('');
-
-      // Render Games
-      document.getElementById('gameGrid').innerHTML = data.games.map(g => `
-        <div class="bg-white rounded-xl shadow-sm hover:shadow-xl transition duration-300 overflow-hidden flex flex-col h-full card-zoom border border-gray-100">
-          <div class="h-36 overflow-hidden relative bg-gray-100">
-            <img src="${g.image}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/150'">
-          </div>
-          <div class="p-3 flex-1 flex flex-col justify-between">
-             <div>
-               <h3 class="font-bold text-gray-800 text-sm truncate">${g.name}</h3>
-               <div class="flex items-center space-x-1 mt-1">
-                 <i class="fa-solid fa-gem text-purple-500 text-xs"></i>
-                 <span class="text-xs text-gray-600 font-medium">${g.items}</span>
-               </div>
-               ${g.freeItem && g.freeItem !== '-' ? `<span class="inline-block mt-1 bg-orange-100 text-orange-600 text-[10px] px-1.5 py-0.5 rounded font-bold">+ แถม ${g.freeItem}</span>` : ''}
-             </div>
-             <button onclick="buy('${g.name}')" class="w-full mt-3 bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white font-bold py-1.5 rounded-lg text-xs transition-colors">เติมเกม</button>
-          </div>
-        </div>
-      `).join('');
+        document.getElementById('loadingOverlay').classList.add('hidden');
+        document.getElementById('productGrid').innerHTML = data.products.map(p => `
+            <div class="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden card-zoom border border-gray-100 flex flex-col h-full">
+                <div class="h-36 overflow-hidden relative bg-gray-100"><img src="${p.image}" class="w-full h-full object-cover">
+                ${p.discount > 0 ? `<div class="absolute top-2 right-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded">- ${p.discount}</div>` : ''}</div>
+                <div class="p-3 flex-1 flex flex-col justify-between"><div><h3 class="font-bold text-gray-800 text-sm truncate">${p.name}</h3><p class="text-xs text-gray-500 mt-1 line-clamp-1">${p.detail}</p></div>
+                <div class="mt-2 pt-2 border-t border-gray-100"><div class="flex justify-between items-end mb-2"><span class="text-blue-600 font-bold text-sm">฿${(p.price - p.discount).toLocaleString()}</span><span class="text-[10px] text-gray-400 line-through">฿${p.price.toLocaleString()}</span></div><button onclick="buyItem('${p.name}')" class="w-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white text-xs font-bold py-1.5 rounded transition">สั่งซื้อ</button></div></div>
+            </div>`).join('');
+        document.getElementById('gameGrid').innerHTML = data.games.map(g => `
+            <div class="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden card-zoom border border-gray-100 flex flex-col h-full">
+                <div class="h-36 overflow-hidden relative bg-gray-100"><img src="${g.image}" class="w-full h-full object-cover"></div>
+                <div class="p-3 flex-1 flex flex-col justify-between"><div><h3 class="font-bold text-gray-800 text-sm truncate">${g.name}</h3><p class="text-xs text-purple-600 font-medium mt-1"><i class="fa-solid fa-gem mr-1"></i>${g.items}</p>${g.freeItem != '-' ? `<p class="text-[10px] text-orange-500 font-bold">+ แถม ${g.freeItem}</p>` : ''}</div><button onclick="buyItem('${g.name}')" class="w-full mt-2 bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white text-xs font-bold py-1.5 rounded transition">เติมเกม</button></div>
+            </div>`).join('');
     }
 
-    // --- Actions ---
-    function buy(item) {
-      if(!currentUser) {
-        Swal.fire({
-          title: 'กรุณาเข้าสู่ระบบ',
-          text: 'สมัครสมาชิก หรือ ล็อกอิน เพื่อทำรายการต่อ',
-          icon: 'warning',
-          confirmButtonText: 'เข้าสู่ระบบ',
-          confirmButtonColor: '#2563EB'
-        }).then((res) => {
-          if(res.isConfirmed) openModal();
-        });
-        return;
-      }
-      Swal.fire('ยืนยันคำสั่งซื้อ', `คุณต้องการซื้อ "${item}" ใช่หรือไม่?<br><small class="text-gray-500">ทีมงานจะติดต่อกลับทาง Line: ${currentUser.lineId}</small>`, 'question');
+    function buyItem(name) {
+        if (!currentUser) {
+            Swal.fire({ title: 'กรุณาเข้าสู่ระบบ', text: 'คุณต้องล็อกอินก่อนทำรายการ', icon: 'warning', confirmButtonText: 'เข้าสู่ระบบ', confirmButtonColor: '#181a20' }).then((res) => { if(res.isConfirmed) openAuthModal(); });
+            return;
+        }
+        Swal.fire('ยืนยันคำสั่งซื้อ', `ต้องการซื้อ ${name} ใช่ไหม?<br>ระบบจะแจ้งเตือนทาง Line`, 'question');
     }
 
-    // --- Modal Logic ---
-    function openModal() {
-      document.getElementById('authModal').classList.remove('hidden');
-      switchTab('login');
-    }
-    function closeModal() {
-      document.getElementById('authModal').classList.add('hidden');
-    }
+    // --- Auth Logic ---
 
-    function switchTab(tab) {
-      const loginForm = document.getElementById('loginForm');
-      const regForm = document.getElementById('registerForm');
-      const tLogin = document.getElementById('tabLogin');
-      const tReg = document.getElementById('tabRegister');
+    function openAuthModal() {
+        document.getElementById('authModal').classList.remove('hidden');
+        isLoginView = true;
+        updateView();
+    }
+    function closeAuthModal() { document.getElementById('authModal').classList.add('hidden'); }
+    function toggleMainView() { isLoginView = !isLoginView; updateView(); }
 
-      if(tab === 'login') {
-        loginForm.classList.remove('hidden');
-        regForm.classList.add('hidden');
-        tLogin.className = "flex-1 py-4 text-center font-bold text-blue-600 border-b-2 border-blue-600 bg-blue-50";
-        tReg.className = "flex-1 py-4 text-center font-bold text-gray-500 hover:bg-gray-50 transition";
-      } else {
-        loginForm.classList.add('hidden');
-        regForm.classList.remove('hidden');
-        tLogin.className = "flex-1 py-4 text-center font-bold text-gray-500 hover:bg-gray-50 transition";
-        tReg.className = "flex-1 py-4 text-center font-bold text-purple-600 border-b-2 border-purple-600 bg-purple-50";
-      }
+    function updateView() {
+        const viewLogin = document.getElementById('view-login');
+        const viewRegister = document.getElementById('view-register');
+        const pageTitle = document.getElementById('page-title');
+        const switchBtnText = document.getElementById('switch-btn-text');
+        if (isLoginView) {
+            viewLogin.classList.remove('hidden'); viewRegister.classList.add('hidden');
+            pageTitle.innerText = "เข้าสู่ระบบ"; switchBtnText.innerText = "สมัครสมาชิก";
+        } else {
+            viewRegister.classList.remove('hidden'); viewLogin.classList.add('hidden');
+            pageTitle.innerText = "สมัครสมาชิก"; switchBtnText.innerText = "เข้าสู่ระบบ";
+        }
     }
 
-    function setLoginType(type) {
-      document.getElementById('loginMode').value = type;
-      const passF = document.getElementById('fieldPass');
-      const otpF = document.getElementById('fieldOtp');
-      const btnP = document.getElementById('typePass');
-      const btnO = document.getElementById('typeOtp');
+    function switchLoginTab(tab) {
+        if(tab === 'main') {
+            document.getElementById('tab-login-main').classList.add('active');
+            document.getElementById('tab-login-otp').classList.remove('active');
+            document.getElementById('form-login-main').classList.remove('hidden');
+            document.getElementById('form-login-otp').classList.add('hidden');
+        } else {
+            document.getElementById('tab-login-otp').classList.add('active');
+            document.getElementById('tab-login-main').classList.remove('active');
+            document.getElementById('form-login-otp').classList.remove('hidden');
+            document.getElementById('form-login-main').classList.add('hidden');
+        }
+    }
 
-      if(type === 'password') {
-        passF.classList.remove('hidden');
-        otpF.classList.add('hidden');
-        btnP.className = "flex-1 py-1.5 rounded-md bg-white text-blue-600 shadow-sm text-sm font-semibold transition";
-        btnO.className = "flex-1 py-1.5 rounded-md text-gray-500 text-sm font-semibold transition hover:text-gray-700";
-      } else {
-        passF.classList.add('hidden');
-        otpF.classList.remove('hidden');
-        btnP.className = "flex-1 py-1.5 rounded-md text-gray-500 text-sm font-semibold transition hover:text-gray-700";
-        btnO.className = "flex-1 py-1.5 rounded-md bg-white text-blue-600 shadow-sm text-sm font-semibold transition";
-      }
+    // Toggle Login Method (Email vs Phone)
+    function toggleLoginMethod() {
+        const method = document.getElementById('login-method-select').value;
+        if (method === 'phone') {
+            document.getElementById('input-group-email').classList.add('hidden');
+            document.getElementById('input-group-phone').classList.remove('hidden');
+        } else {
+            document.getElementById('input-group-email').classList.remove('hidden');
+            document.getElementById('input-group-phone').classList.add('hidden');
+        }
+    }
+
+    function togglePass(id) {
+        const el = document.getElementById(id);
+        const icon = el.nextElementSibling;
+        if(el.type === 'password') { el.type = 'text'; icon.classList.remove('fa-eye'); icon.classList.add('fa-eye-slash', 'text-blue-400'); }
+        else { el.type = 'password'; icon.classList.add('fa-eye'); icon.classList.remove('fa-eye-slash', 'text-blue-400'); }
     }
 
     // --- Backend Calls ---
-    function getOtp(emailId) {
-      const email = document.getElementById(emailId).value;
-      if(!email) return Swal.fire('แจ้งเตือน', 'กรุณากรอกอีเมลก่อน', 'warning');
-      
-      const btn = event.target;
-      const oldText = btn.innerText;
-      btn.innerText = 'ส่ง..'; btn.disabled = true;
 
-      google.script.run.withSuccessHandler(res => {
-         btn.innerText = oldText; btn.disabled = false;
-         if(res.success) Swal.fire('สำเร็จ', res.message, 'success');
-         else Swal.fire('ผิดพลาด', res.message, 'error');
-      }).sendOtpEmail(email);
+    function requestOtp(emailId, btn) {
+        const email = document.getElementById(emailId).value;
+        if(!email) { Swal.fire('แจ้งเตือน', 'กรุณากรอกอีเมล', 'warning'); return; }
+        const oldText = btn.innerText; btn.disabled = true; let count = 60;
+        google.script.run.withSuccessHandler(res => {
+            if(res.success) {
+                Swal.fire({toast:true, position:'top-end', icon:'success', title:'ส่ง OTP แล้ว', timer:3000, showConfirmButton:false});
+                const timer = setInterval(() => { btn.innerText = `รอ ${count}s`; count--; if(count < 0) { clearInterval(timer); btn.disabled=false; btn.innerText = "ส่งอีกครั้ง"; } }, 1000);
+            } else { btn.disabled = false; btn.innerText = oldText; Swal.fire('Error', res.message, 'error'); }
+        }).sendOtpEmail(email);
     }
 
-    function doRegister(e) {
-      e.preventDefault();
-      const btn = document.getElementById('btnReg');
-      btn.innerText = 'กำลังบันทึก...'; btn.disabled = true;
+    // Login with Email/Phone + Password
+    function submitLogin() {
+        const method = document.getElementById('login-method-select').value;
+        const password = document.getElementById('login-pass').value;
+        
+        if (!password) return Swal.fire('แจ้งเตือน', 'กรุณากรอกรหัสผ่าน', 'warning');
 
-      const data = {
-        country: document.getElementById('regCountry').value,
-        phone: document.getElementById('regPhone').value,
-        lineId: document.getElementById('regLine').value,
-        email: document.getElementById('regEmail').value,
-        otp: document.getElementById('regOtp').value,
-        password: document.getElementById('regPass').value
-      };
-
-      google.script.run.withSuccessHandler(res => {
-        btn.innerText = 'สมัครสมาชิก'; btn.disabled = false;
-        if(res.success) {
-          Swal.fire('เรียบร้อย', 'สมัครสมาชิกสำเร็จ โปรดเข้าสู่ระบบ', 'success');
-          switchTab('login');
+        let payload = {};
+        
+        if (method === 'email') {
+            const identifier = document.getElementById('login-username').value;
+            if (!identifier) return Swal.fire('แจ้งเตือน', 'กรุณากรอกอีเมลหรือชื่อผู้ใช้', 'warning');
+            payload = { type: 'email_password', identifier: identifier, password: password };
         } else {
-          Swal.fire('ล้มเหลว', res.message, 'error');
+            const phone = document.getElementById('login-phone').value;
+            const country = document.getElementById('login-selected-name').innerText;
+            if (!phone) return Swal.fire('แจ้งเตือน', 'กรุณากรอกเบอร์โทรศัพท์', 'warning');
+            payload = { type: 'phone_password', country: country, phone: phone, password: password };
         }
-      }).registerUser(data);
+
+        Swal.showLoading();
+        google.script.run.withSuccessHandler(res => {
+            if(res.success) {
+                currentUser = res.user; Swal.close(); closeAuthModal(); updateUserUI();
+                Swal.fire({icon:'success', title:'ยินดีต้อนรับ', text: `สวัสดีคุณ ${currentUser.email}`, timer:1500, showConfirmButton:false});
+            } else { Swal.fire('เข้าสู่ระบบไม่สำเร็จ', res.message, 'error'); }
+        }).loginUser(payload);
     }
 
-    function doLogin(e) {
-      e.preventDefault();
-      const btn = document.getElementById('btnLogin');
-      btn.innerText = 'ตรวจสอบ...'; btn.disabled = true;
-
-      const data = {
-        type: document.getElementById('loginMode').value,
-        email: document.getElementById('loginEmail').value,
-        password: document.getElementById('loginPassword').value,
-        otp: document.getElementById('loginOtp').value
-      };
-
-      google.script.run.withSuccessHandler(res => {
-        btn.innerText = 'เข้าสู่ระบบ'; btn.disabled = false;
-        if(res.success) {
-          currentUser = res.user;
-          document.getElementById('guestMenu').classList.add('hidden');
-          document.getElementById('userMenu').classList.remove('hidden');
-          document.getElementById('userMenu').classList.add('flex');
-          document.getElementById('userNameDisplay').innerText = currentUser.email;
-          closeModal();
-          Swal.fire({
-            toast: true, position: 'top-end', icon: 'success', 
-            title: 'ยินดีต้อนรับกลับมา!', showConfirmButton: false, timer: 3000
-          });
-        } else {
-          Swal.fire('เข้าสู่ระบบไม่สำเร็จ', res.message, 'error');
-        }
-      }).loginUser(data);
+    // Login with Email + OTP
+    function submitLoginOtp() {
+        const email = document.getElementById('login-otp-email').value;
+        const otp = document.getElementById('login-otp-code').value;
+        if (!email || !otp) return Swal.fire('แจ้งเตือน', 'กรุณากรอกข้อมูลให้ครบ', 'warning');
+        
+        Swal.showLoading();
+        google.script.run.withSuccessHandler(res => {
+            if(res.success) {
+                currentUser = res.user; Swal.close(); closeAuthModal(); updateUserUI();
+                Swal.fire({icon:'success', title:'ยินดีต้อนรับ', text: `สวัสดีคุณ ${currentUser.email}`, timer:1500, showConfirmButton:false});
+            } else { Swal.fire('เข้าสู่ระบบไม่สำเร็จ', res.message, 'error'); }
+        }).loginUser({ type: 'otp', identifier: email, otp: otp });
     }
 
+    function submitRegister() {
+        const payload = {
+            email: document.getElementById('reg-email').value,
+            lineId: document.getElementById('reg-line').value,
+            phone: document.getElementById('reg-phone').value,
+            country: document.getElementById('reg-selected-name').innerText,
+            otp: document.getElementById('reg-otp').value,
+            password: document.getElementById('reg-pass').value
+        };
+        if(!payload.email || !payload.otp || !payload.password) return Swal.fire('แจ้งเตือน','กรุณากรอกข้อมูลให้ครบ','warning');
+        Swal.showLoading();
+        google.script.run.withSuccessHandler(res => {
+            if(res.success) { Swal.fire('สำเร็จ', 'สมัครสมาชิกเรียบร้อย โปรดล็อกอิน', 'success'); toggleMainView(); }
+            else { Swal.fire('ผิดพลาด', res.message, 'error'); }
+        }).registerUser(payload);
+    }
+
+    function updateUserUI() {
+        document.getElementById('guestMenu').classList.add('hidden');
+        document.getElementById('userMenu').classList.remove('hidden');
+        document.getElementById('userMenu').classList.add('flex');
+        document.getElementById('userNameDisplay').innerText = currentUser.email;
+    }
     function logout() {
-      currentUser = null;
-      document.getElementById('guestMenu').classList.remove('hidden');
-      document.getElementById('userMenu').classList.add('hidden');
-      document.getElementById('userMenu').classList.remove('flex');
-      Swal.fire('ออกจากระบบ', 'ไว้พบกันใหม่นะครับ', 'info');
+        currentUser = null;
+        document.getElementById('guestMenu').classList.remove('hidden');
+        document.getElementById('userMenu').classList.add('hidden');
+        document.getElementById('userMenu').classList.remove('flex');
+    }
+
+    // --- Country Modal Logic (Shared) ---
+    function openCountryModal(context) {
+        currentCountryContext = context; // 'register' or 'login'
+        document.getElementById('country-modal').classList.add('open');
+        renderCountries(allCountries);
+        document.getElementById('search-country').value = '';
+    }
+    function closeCountryModal() { document.getElementById('country-modal').classList.remove('open'); }
+    function renderCountries(list) {
+        document.getElementById('country-list-container').innerHTML = list.map(c => `
+            <div class="country-list-item" onclick="selectCountry('${c.code}', '${c.name}', '${c.dial_code}')">
+                <img src="https://flagcdn.com/w40/${c.code.toLowerCase()}.png" class="w-6 h-4 rounded-sm mr-3 shadow-sm">
+                <div class="flex-1">
+                    <div class="text-sm text-white font-medium">${c.name}</div>
+                    <div class="text-xs text-gray-500">${c.code}</div>
+                </div>
+                <div class="text-sm text-[#4facfe] font-medium">${c.dial_code}</div>
+            </div>`).join('');
+    }
+    function filterCountries() {
+        const term = document.getElementById('search-country').value.toLowerCase();
+        const filtered = allCountries.filter(c => c.name.toLowerCase().includes(term) || c.dial_code.includes(term));
+        renderCountries(filtered);
+    }
+    function selectCountry(code, name, dial) {
+        const prefix = currentCountryContext === 'login' ? 'login-' : 'reg-';
+        document.getElementById(`${prefix}selected-flag`).src = `https://flagcdn.com/w40/${code.toLowerCase()}.png`;
+        document.getElementById(`${prefix}selected-code`).innerText = dial;
+        document.getElementById(`${prefix}selected-name`).innerText = name;
+        closeCountryModal();
     }
   </script>
 </body>
